@@ -1,0 +1,7 @@
+.env
+.enviroment.js
+node_modules/
+copilot.env
+npm-debug.log
+.vscode/
+.idea/

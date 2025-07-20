@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Football Analytics Pro</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚽ Football Analytics Pro</h1>
+            <p>Analisi avanzata e predizioni intelligenti per il calcio</p>
+            
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="showSection('dashboard')">Dashboard</button>
+                <button class="nav-tab" onclick="showSection('teams')">Squadre</button>
+                <button class="nav-tab" onclick="showSection('predictions')">Predizioni</button>
+                <button class="nav-tab" onclick="showSection('analytics')">Analytics</button>
+                <button class="nav-tab" onclick="showSection('leagues')">Leagues</button>
+            </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="content-section active">
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3>📊 Statistiche Generali</h3>
+                    <div class="stat-item">
+                        <div class="stat-value">24</div>
+                        <div>Squadre monitorate</div>
+                    </div>
+                    <div class="stat-item" style="margin-top: 10px;">
+                        <div class="stat-value">156</div>
+                        <div>Partite analizzate</div>
+                    </div>
+                    <div class="stat-item" style="margin-top: 10px;">
+                        <div class="stat-value">73%</div>
+                        <div>Accuratezza predizioni</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>🎯 Prossime Predizioni</h3>
+                    <div class="prediction-item">
+                        <span>Milan vs Inter - Over 2.5 Gol</span>
+                        <span class="confidence high">85%</span>
+                    </div>
+                    <div class="prediction-item">
+                        <span>Napoli vs Roma - Over 9.5 Corner</span>
+                        <span class="confidence medium">68%</span>
+                    </div>
+                    <div class="prediction-item">
+                        <span>Juventus vs Lazio - Under 22.5 Tiri</span>
+                        <span class="confidence high">78%</span>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>📈 Performance Modelli</h3>
+                    <div class="chart-container">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teams Section -->
+        <div id="teams" class="content-section">
+            <div class="team-list" id="teamList">
+                <!-- Teams will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Predictions Section -->
+        <div id="predictions" class="content-section">
+            <div class="dashboard-grid">
+                <div class="card prediction-card">
+                    <h3>🔮 Predizioni Attive</h3>
+                    <div class="prediction-item">
+                        <div>
+                            <strong>Milan vs Inter</strong><br>
+                            <small>Over 2.5 Gol</small>
+                        </div>
+                        <span class="confidence high">85%</span>
+                    </div>
+                    <div class="prediction-item">
+                        <div>
+                            <strong>Napoli vs Roma</strong><br>
+                            <small>Over 9.5 Corner</small>
+                        </div>
+                        <span class="confidence medium">68%</span>
+                    </div>
+                    <div class="prediction-item">
+                        <div>
+                            <strong>Juventus vs Lazio</strong><br>
+                            <small>Under 22.5 Tiri</small>
+                        </div>
+                        <span class="confidence high">78%</span>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>📊 Storico Predizioni</h3>
+                    <div class="chart-container">
+                        <canvas id="predictionsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Section -->
+        <div id="analytics" class="content-section">
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3>🏆 Top Squadre per Gol</h3>
+                    <div class="chart-container">
+                        <canvas id="goalsChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>⚽ Analisi Corner</h3>
+                    <div class="chart-container">
+                        <canvas id="cornersChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leagues Section -->
+        <div id="leagues" class="content-section">
+            <div class="card" style="margin-bottom: 25px;">
+                <h3>🏆 Seleziona Campionato</h3>
+                <div class="form-group">
+                    <select id="leagueSelect" onchange="loadLeagueMatches()">
+                        <option value="">Seleziona un campionato...</option>
+                        <option value="564">Serie A (Italia)</option>
+                        <option value="39">Premier League (Inghilterra)</option>
+                        <option value="140">La Liga (Spagna)</option>
+                        <option value="78">Bundesliga (Germania)</option>
+                        <option value="61">Ligue 1 (Francia)</option>
+                        <option value="2">Champions League</option>
+                    </select>
+                </div>
+                <div id="leagueInfo" class="league-info" style="display: none;">
+                    <p><strong>Stagione:</strong> <span id="seasonInfo">2024-2025</span></p>
+                    <p><strong>Status:</strong> <span id="statusInfo">In corso</span></p>
+                </div>
+            </div>
+
+            <div id="matchesContainer">
+                <div id="loadingMatches" style="display: none; text-align: center; padding: 50px;">
+                    <div class="loading-spinner">Caricamento partite...</div>
+                </div>
+                <div id="matchesList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Team Button -->
+    <button class="add-team-btn" onclick="openAddTeamModal()">+</button>
+
+    <!-- Add Team Modal -->
+    <div id="addTeamModal" class="modal">
+        <div class="modal-content">
+            <h3>Aggiungi Nuova Squadra</h3>
+            <form id="addTeamForm">
+                <div class="form-group">
+                    <label>Nome Squadra</label>
+                    <input type="text" id="teamName" required>
+                </div>
+                <div class="form-group">
+                    <label>Allenatore</label>
+                    <input type="text" id="coachName" required>
+                </div>
+                <div class="form-group">
+                    <label>Formazione Principale</label>
+                    <select id="formation">
+                        <option value="4-3-3">4-3-3</option>
+                        <option value="4-4-2">4-4-2</option>
+                        <option value="3-5-2">3-5-2</option>
+                        <option value="4-2-3-1">4-2-3-1</option>
+                        <option value="5-3-2">5-3-2</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Stile di Gioco</label>
+                    <select id="playStyle">
+                        <option value="Offensivo">Offensivo</option>
+                        <option value="Difensivo">Difensivo</option>
+                        <option value="Possesso">Possesso</option>
+                        <option value="Contropiede">Contropiede</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Aggiungi Squadra</button>
+                <button type="button" class="btn btn-secondary" onclick="closeAddTeamModal()">Annulla</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // API Configuration
+            const API_BASE_URL = 'http://localhost:3001/api';
+
+        // Sample data
+        let teams = [
+            {
+                name: "AC Milan",
+                coach: "Stefano Pioli",
+                formation: "4-2-3-1",
+                style: "Possesso",
+                goals: 2.3,
+                corners: 5.8,
+                shots: 14.2,
+                possession: 58
+            },
+            {
+                name: "Inter",
+                coach: "Simone Inzaghi",
+                formation: "3-5-2",
+                style: "Offensivo",
+                goals: 2.1,
+                corners: 6.2,
+                shots: 15.1,
+                possession: 55
+            },
+            {
+                name: "Napoli",
+                coach: "Rudi Garcia",
+                formation: "4-3-3",
+                style: "Offensivo",
+                goals: 2.4,
+                corners: 5.5,
+                shots: 16.3,
+                possession: 60
+            },
+            {
+                name: "Juventus",
+                coach: "Massimiliano Allegri",
+                formation: "4-4-2",
+                style: "Difensivo",
+                goals: 1.8,
+                corners: 4.9,
+                shots: 12.7,
+                possession: 52
+            }
+        ];
+
+        // API Functions
+        async function apiRequest(endpoint, options = {}) {
+            try {
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
+            }
+        }
+
+
+    async function populateLeaguesDropdown() {
+    const dropdown = document.getElementById('leagueSelect');
+    dropdown.innerHTML = '<option value="">Seleziona un campionato...</option>';
+    
+    try {
+        const response = await fetch('http://localhost:3001/api/leagues');
+        const data = await response.json();
+        data.data.forEach(league => {
+            const option = document.createElement('option');
+            option.value = league.id;
+            option.textContent = `${league.name} (${league.short_code || 'N/A'})`;
+            dropdown.appendChild(option);
+        });
+
+    } catch (error) {
+        console.error('Errore nel caricamento delle leghe:', error);
+    }
+}
+
+        async function loadTeams() {
+            try {
+                const response = await apiRequest('/teams');
+                if (response.success && response.data) {
+                    return response.data;
+                }
+                return [];
+            } catch (error) {
+                console.error('Error loading teams:', error);
+                return [];
+            }
+        }
+
+        async function loadLeagues() {
+            try {
+                const response = await apiRequest('/leagues/popular');
+                if (response.success && response.data) {
+                    return response.data;
+                }
+                return [];
+            } catch (error) {
+                console.error('Error loading leagues:', error);
+                return [];
+            }
+        }
+
+        async function loadMatches(leagueId) {
+            try {
+                const response = await apiRequest(`/leagues/${leagueId}/fixtures`);
+                if (response.success && response.data) {
+                    return response.data;
+                }
+                return [];
+            } catch (error) {
+                console.error('Error loading matches:', error);
+                return [];
+            }
+        }
+
+
+        async function loadTeamFixtures(teamId) {
+            try {
+                const response = await apiRequest(`/teams/${teamId}/fixtures`);
+                if (response.success && response.data) {
+                    return response.data;
+                }
+                return [];
+            } catch (error) {
+                console.error('Error loading team fixtures:', error);
+                return [];
+            }
+        }
+
+        async function loadTeamStatistics(teamId) {
+            try {
+                const response = await apiRequest(`/teams/${teamId}/statistics`);
+                if (response.success && response.data) {
+                    return response.data;
+                }
+                return null;
+            } catch (error) {
+                console.error('Error loading team statistics:', error);
+                return null;
+            }
+        }
+
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        function renderTeams() {
+            const teamList = document.getElementById('teamList');
+            teamList.innerHTML = '';
+            
+            teams.forEach(team => {
+                const teamCard = document.createElement('div');
+                teamCard.className = 'team-card';
+                teamCard.innerHTML = `
+                    <div class="team-header">
+                        <div class="team-logo">${team.name.charAt(0)}</div>
+                        <div>
+                            <h3>${team.name}</h3>
+                            <p>Allenatore: ${team.coach}</p>
+                            <p>Formazione: ${team.formation} | Stile: ${team.style}</p>
+                        </div>
+                    </div>
+                    <div class="team-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">${team.goals}</div>
+                            <div>Gol/Partita</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${team.corners}</div>
+                            <div>Corner/Partita</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${team.shots}</div>
+                            <div>Tiri/Partita</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${team.possession}%</div>
+                            <div>Possesso</div>
+                        </div>
+                    </div>
+                `;
+                teamList.appendChild(teamCard);
+            });
+        }
+
+        function openAddTeamModal() {
+            document.getElementById('addTeamModal').style.display = 'block';
+        }
+
+        function closeAddTeamModal() {
+            document.getElementById('addTeamModal').style.display = 'none';
+            document.getElementById('addTeamForm').reset();
+        }
+
+        document.getElementById('addTeamForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newTeam = {
+                name: document.getElementById('teamName').value,
+                coach: document.getElementById('coachName').value,
+                formation: document.getElementById('formation').value,
+                style: document.getElementById('playStyle').value,
+                goals: (Math.random() * 2 + 1).toFixed(1),
+                corners: (Math.random() * 3 + 4).toFixed(1),
+                shots: (Math.random() * 5 + 10).toFixed(1),
+                possession: Math.floor(Math.random() * 20 + 45)
+            };
+            
+            teams.push(newTeam);
+            renderTeams();
+            closeAddTeamModal();
+        });
+
+        // Leagues functionality
+        async function loadLeagueMatches() {
+            const leagueSelect = document.getElementById('leagueSelect');
+            const selectedLeagueId = leagueSelect.value;
+            
+            if (!selectedLeagueId) {
+                document.getElementById('matchesList').innerHTML = '';
+                document.getElementById('leagueInfo').style.display = 'none';
+                return;
+            }
+
+            const matchesContainer = document.getElementById('matchesContainer');
+            const loadingElement = document.getElementById('loadingMatches');
+            const matchesList = document.getElementById('matchesList');
+            const leagueInfo = document.getElementById('leagueInfo');
+
+            loadingElement.style.display = 'block';
+            matchesList.innerHTML = '';
+            leagueInfo.style.display = 'block';
+
+            try {
+                const matches = await loadMatches(selectedLeagueId);
+                displayMatches(matches.slice(0, 10));
+                
+            } catch (error) {
+                console.error('Error loading matches:', error);
+                showError(error.message);
+                displaySampleMatches();
+            } finally {
+                loadingElement.style.display = 'none';
+            }
+        }
+
+        function displayMatches(matches) {
+            const matchesList = document.getElementById('matchesList');
+            matchesList.innerHTML = '';
+
+            if (!matches || matches.length === 0) {
+                matchesList.innerHTML = '<p>Nessuna partita trovata per questo campionato.</p>';
+                return;
+            }
+
+            matches.forEach((match, index) => {
+                const matchCard = createMatchCard(match, index);
+                matchesList.appendChild(matchCard);
+            });
+        }
+
+        function displaySampleMatches() {
+            const sampleMatches = [
+                {
+                    id: 1,
+                    starting_at: '2024-05-25T20:45:00+00:00',
+                    home_team: { name: 'AC Milan' },
+                    away_team: { name: 'Inter' },
+                    league: { name: 'Serie A' }
+                },
+                {
+                    id: 2,
+                    starting_at: '2024-05-26T18:00:00+00:00',
+                    home_team: { name: 'Napoli' },
+                    away_team: { name: 'Roma' },
+                    league: { name: 'Serie A' }
+                }
+            ];
+
+            displayMatches(sampleMatches);
+        }
+
+        function createMatchCard(match, index) {
+            const matchDiv = document.createElement('div');
+            matchDiv.className = 'match-card';
+            matchDiv.onclick = () => toggleMatchDetails(index, match);
+
+            const matchDate = new Date(match.starting_at || match.fixture?.date);
+            const formattedDate = matchDate.toLocaleDateString('it-IT') + ' ' + matchDate.toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
+
+            const homeTeam = match.home_team?.name || match.teams?.home?.name || 'Team Casa';
+            const awayTeam = match.away_team?.name || match.teams?.away?.name || 'Team Trasferta';
+
+            matchDiv.innerHTML = `
+                <div class="match-header">
+                    <div class="match-teams">
+                        <span>${homeTeam}</span>
+                        <span class="vs-separator">VS</span>
+                        <span>${awayTeam}</span>
+                    </div>
+                    <div class="match-date">${formattedDate}</div>
+                </div>
+                <div id="matchDetails${index}" class="match-details">
+                    <div class="match-stats" id="matchStats${index}">
+                        <!-- Stats will be loaded here -->
+                    </div>
+                </div>
+            `;
+
+            return matchDiv;
+        }
+
+        async function toggleMatchDetails(index, match) {
+            const detailsElement = document.getElementById(`matchDetails${index}`);
+            const statsElement = document.getElementById(`matchStats${index}`);
+
+            if (detailsElement.classList.contains('active')) {
+                detailsElement.classList.remove('active');
+                return;
+            }
+
+            detailsElement.classList.add('active');
+
+            // Load match statistics
+            try {
+                await loadMatchStats(match, statsElement);
+            } catch (error) {
+                console.error('Error loading match stats:', error);
+                showSampleStats(statsElement, match);
+            }
+        }
+
+        async function loadMatchStats(match, statsElement) {
+            // Try to load real statistics if available
+            try {
+                if (match.id) {
+                    const statsResponse = await apiRequest(`/matches/${match.id}/statistics`);
+                    if (statsResponse.success && statsResponse.data) {
+                        displayRealStats(statsElement, statsResponse.data);
+                        return;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading real stats:', error);
+            }
+
+            // Fallback to sample stats
+            showSampleStats(statsElement, match);
+        }
+
+        function displayRealStats(statsElement, stats) {
+            // Process real statistics from API
+            statsElement.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-title">📊 Statistiche Reali</div>
+                    <div class="stat-comparison">
+                        <span>Dati caricati dall'API</span>
+                    </div>
+                </div>
+                <div class="api-status connected" style="margin-top: 15px;">
+                    ✅ Connesso all'API - Dati reali
+                </div>
+            `;
+        }
+
+        function showSampleStats(statsElement, match) {
+            // Generate realistic random stats for demonstration
+            const homeGoals = (Math.random() * 1.5 + 0.8).toFixed(1);
+            const awayGoals = (Math.random() * 1.2 + 0.6).toFixed(1);
+            const homeCorners = (Math.random() * 3 + 4).toFixed(1);
+            const awayCorners = (Math.random() * 2.5 + 3.5).toFixed(1);
+            const homeShots = (Math.random() * 5 + 12).toFixed(1);
+            const awayShots = (Math.random() * 4 + 10).toFixed(1);
+            const homePossession = (Math.random() * 15 + 45).toFixed(0);
+            const awayPossession = (100 - homePossession).toFixed(0);
+
+            statsElement.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-title">⚽ Gol Medi per Partita</div>
+                    <div class="stat-comparison">
+                        <span class="team-stat ${homeGoals > awayGoals ? 'home-advantage' : ''}">${homeGoals}</span>
+                        <span>VS</span>
+                        <span class="team-stat ${awayGoals > homeGoals ? 'away-advantage' : ''}">${awayGoals}</span>
+                    </div>
+                    <small style="color: #666; display: block; margin-top: 5px;">
+                        Casa vs Trasferta: ${(homeGoals - awayGoals).toFixed(1)} differenza
+                    </small>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">📐 Corner Medi per Partita</div>
+                    <div class="stat-comparison">
+                        <span class="team-stat ${homeCorners > awayCorners ? 'home-advantage' : ''}">${homeCorners}</span>
+                        <span>VS</span>
+                        <span class="team-stat ${awayCorners > homeCorners ? 'away-advantage' : ''}">${awayCorners}</span>
+                    </div>
+                    <small style="color: #666; display: block; margin-top: 5px;">
+                        Casa vs Trasferta: ${(homeCorners - awayCorners).toFixed(1)} differenza
+                    </small>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">🎯 Tiri Medi per Partita</div>
+                    <div class="stat-comparison">
+                        <span class="team-stat ${homeShots > awayShots ? 'home-advantage' : ''}">${homeShots}</span>
+                        <span>VS</span>
+                        <span class="team-stat ${awayShots > homeShots ? 'away-advantage' : ''}">${awayShots}</span>
+                    </div>
+                    <small style="color: #666; display: block; margin-top: 5px;">
+                        Casa vs Trasferta: ${(homeShots - awayShots).toFixed(1)} differenza
+                    </small>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">⚽ Possesso Medio (%)</div>
+                    <div class="stat-comparison">
+                        <span class="team-stat ${homePossession > awayPossession ? 'home-advantage' : ''}">${homePossession}%</span>
+                        <span>VS</span>
+                        <span class="team-stat ${awayPossession > homePossession ? 'away-advantage' : ''}">${awayPossession}%</span>
+                    </div>
+                    <small style="color: #666; display: block; margin-top: 5px;">
+                        Casa vs Trasferta: ${(homePossession - awayPossession)} punti differenza
+                    </small>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">🔥 Forma Recente</div>
+                    <div class="stat-comparison">
+                        <span class="team-stat">WDWLW</span>
+                        <span>VS</span>
+                        <span class="team-stat">LWDWD</span>
+                    </div>
+                    <small style="color: #666; display: block; margin-top: 5px;">
+                        Ultime 5 partite (W=Vittoria, D=Pareggio, L=Sconfitta)
+                    </small>
+                </div>
+                <div class="api-status disconnected" style="margin-top: 15px;">
+                    📊 Dati di esempio - Connessione API in corso...
+                </div>
+            `;
+        }
+
+        function showError(message) {
+            const matchesList = document.getElementById('matchesList');
+            matchesList.innerHTML = `
+                <div class="error-message">
+                    <strong>Errore nel caricamento dei dati:</strong><br>
+                    ${message}<br><br>
+                    <small>Verifica che il server backend sia in esecuzione su localhost:3000</small>
+                </div>
+            `;
+        }
+
+        // Initialize charts
+        function initCharts() {
+            // Performance Chart
+            const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+            new Chart(performanceCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Gen', 'Feb', 'Mar', 'Apr', 'Mag'],
+                    datasets: [{
+                        label: 'Accuratezza %',
+                        data: [65, 70, 73, 75, 73],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            // Predictions Chart
+            const predictionsCtx = document.getElementById('predictionsChart').getContext('2d');
+            new Chart(predictionsCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Corrette', 'Errate'],
+                    datasets: [{
+                        data: [73, 27],
+                        backgroundColor: ['#667eea', '#e74c3c']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+
+            // Goals Chart
+            const goalsCtx = document.getElementById('goalsChart').getContext('2d');
+            new Chart(goalsCtx, {
+                type: 'bar',
+                data: {
+                    labels: teams.map(t => t.name),
+                    datasets: [{
+                        label: 'Gol/Partita',
+                        data: teams.map(t => t.goals),
+                        backgroundColor: '#667eea'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            // Corners Chart
+            const cornersCtx = document.getElementById('cornersChart').getContext('2d');
+            new Chart(cornersCtx, {
+                type: 'radar',
+                data: {
+                    labels: teams.map(t => t.name),
+                    datasets: [{
+                        label: 'Corner/Partita',
+                        data: teams.map(t => t.corners),
+                        borderColor: '#764ba2',
+                        backgroundColor: 'rgba(118, 75, 162, 0.2)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('addTeamModal');
+            if (event.target == modal) {
+                closeAddTeamModal();
+            }
+        }
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            renderTeams();
+            setTimeout(initCharts, 100); // Small delay to ensure DOM is ready
+            populateLeaguesDropdown();
+        });
+    </script>
+</body>
+</html>
